@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pulso</title>
+    <link rel="stylesheet" href="estilos.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Pulso</h1>
+      <p id="resumen">Cargando…</p>
+    </header>
+    <main>
+      <form id="alta">
+        <label for="url">URL a monitorear</label>
+        <input id="url" name="url" type="url" required placeholder="https://example.com" />
+        <label for="intervalo">Cada (segundos)</label>
+        <input id="intervalo" name="intervalo" type="number" min="10" max="3600" value="30" />
+        <button type="submit">Agregar</button>
+        <p id="error" role="alert" hidden></p>
+      </form>
+      <table>
+        <thead>
+          <tr><th>Estado</th><th>URL</th><th>Último chequeo</th><th>Latencia</th><th>Disponibilidad 24 h</th><th></th></tr>
+        </thead>
+        <tbody id="monitores"></tbody>
+      </table>
+    </main>
+  </body>
+</html>

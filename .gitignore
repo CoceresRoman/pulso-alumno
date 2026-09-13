@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+*.log
+# generados al construir y publicar (no hace falta versionarlos)
+*.metadata.json
+sbom.spdx.json

@@ -1,0 +1,41 @@
+{
+  "name": "pulso",
+  "version": "1.0.0",
+  "description": "Monitor de uptime para practicar DevOps: api, worker, cola y status page",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test --test-concurrency=1 \"test/unit/**/*.test.ts\" \"test/datos/**/*.test.ts\"",
+    "test:integracion": "node --test --test-concurrency=1 \"test/integracion/**/*.test.ts\"",
+    "migrar": "node dist/migrar.js",
+    "dev:migrar": "node src/migrar.ts",
+    "sitio-lento": "node dist/sitio-lento/servidor.js",
+    "dev:sitio-lento": "node src/sitio-lento/servidor.ts",
+    "api": "node dist/api/servidor.js",
+    "dev:api": "node --watch src/api/servidor.ts",
+    "worker": "node dist/worker/principal.js",
+    "dev:worker": "node --watch src/worker/principal.ts"
+  },
+  "dependencies": {
+    "@prometheus-io/client": "^0.16.1",
+    "bullmq": "^6.3.4",
+    "express": "^5.2.1",
+    "ioredis": "^6.0.0",
+    "pg": "^8.23.0",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@electric-sql/pglite-socket": "^0.2.11",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.13.4",
+    "@types/pg": "^8.23.1",
+    "typescript": "^7.0.2"
+  }
+}

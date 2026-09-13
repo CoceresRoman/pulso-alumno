@@ -1,0 +1,12 @@
+node_modules
+dist
+test
+web
+.git
+.gitignore
+.env
+*.log
+.nvmrc
+README.md
+FALLAS.md
+LICENSE
