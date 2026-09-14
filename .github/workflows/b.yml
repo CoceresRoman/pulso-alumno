@@ -1,0 +1,11 @@
+name: prueba-b-ejemplo
+on:
+  pull_request:
+    branches: ["main"]
+permissions: {}
+jobs:
+  b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "hola desde b" >> "$GITHUB_STEP_SUMMARY"

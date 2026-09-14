@@ -1,0 +1,11 @@
+name: prueba-a-ejemplo
+on:
+  push:
+    branches: ["leccion/**"]
+permissions: {}
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "hola desde a" >> "$GITHUB_STEP_SUMMARY"
