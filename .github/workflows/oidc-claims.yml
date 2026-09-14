@@ -1,0 +1,65 @@
+name: oidc-claims
+
+# Workflow temporal: lee los claims del token OIDC (nunca imprime el token)
+# para fijar el trust de los roles de AWS. Se borra junto con la rama.
+
+on:
+  push:
+    branches: ["leccion/terraform-aws/claims-oidc"]
+  pull_request:
+    branches: ["main"]
+
+permissions: {}
+
+jobs:
+  rama:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Claims del token OIDC (nunca el token)
+        shell: bash
+        run: |
+          set -euo pipefail
+          token=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r .value)
+          echo "::add-mask::$token"
+          printf '%s' "$token" | python3 -c 'import sys,base64,json; p=sys.stdin.read().split(".")[1]; p+="="*(-len(p)%4); c=json.loads(base64.urlsafe_b64decode(p)); print(json.dumps({k: c.get(k) for k in ["sub","aud","repository","repository_id","repository_owner_id","ref","environment","event_name"]}, indent=2))'
+
+  entorno:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: aws-produccion
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Claims del token OIDC con environment (nunca el token)
+        shell: bash
+        run: |
+          set -euo pipefail
+          token=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r .value)
+          echo "::add-mask::$token"
+          printf '%s' "$token" | python3 -c 'import sys,base64,json; p=sys.stdin.read().split(".")[1]; p+="="*(-len(p)%4); c=json.loads(base64.urlsafe_b64decode(p)); print(json.dumps({k: c.get(k) for k in ["sub","aud","repository","repository_id","repository_owner_id","ref","environment","event_name"]}, indent=2))'
+
+  pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Claims del token OIDC en pull_request (nunca el token)
+        shell: bash
+        run: |
+          set -euo pipefail
+          token=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r .value)
+          echo "::add-mask::$token"
+          printf '%s' "$token" | python3 -c 'import sys,base64,json; p=sys.stdin.read().split(".")[1]; p+="="*(-len(p)%4); c=json.loads(base64.urlsafe_b64decode(p)); print(json.dumps({k: c.get(k) for k in ["sub","aud","repository","repository_id","repository_owner_id","ref","environment","event_name"]}, indent=2))'
