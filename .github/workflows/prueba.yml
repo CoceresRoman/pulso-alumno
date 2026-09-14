@@ -1,0 +1,11 @@
+name: prueba-sync-ejemplo
+on:
+  pull_request:
+    branches: [main]
+permissions: {}
+jobs:
+  hola:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - run: echo hola
