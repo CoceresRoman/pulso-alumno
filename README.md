@@ -174,3 +174,4 @@ Esta app no tiene autenticación: cualquiera que le llegue a `POST`/`PATCH`/`DEL
 ## Licencia
 
 MIT. Ver [LICENSE](./LICENSE).
+// concurrencia 1 (2026-09-15T00:46:18Z)
