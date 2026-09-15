@@ -39,7 +39,7 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     env:
-      TEST_DATABASE_URL: postgres://pulso:pulso@postgres:5432/pulso_test
+      TEST_DATABASE_URL: postgres://pulso:pulso@localhost:5432/pulso_test
       TEST_REDIS_URL: redis://localhost:6379
     steps:
       - name: Descargar el código
