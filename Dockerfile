@@ -20,7 +20,7 @@ WORKDIR /app
 # upgrade en el momento del build los aplica sin esperar a que alguien publique
 # un tag nuevo de node:24-trixie-slim.
 # hadolint ignore=DL3005
-# (demo Trivy, módulo 4) RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
