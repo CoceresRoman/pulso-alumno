@@ -91,9 +91,11 @@ jobs:
 
       - name: Volcar el resumen de Trivy
         if: always()
+        env:
+          NOMBRE: ${{ matrix.nombre }}
         run: |
           {
-            echo "### Trivy (${{ matrix.nombre }}) — HIGH y CRITICAL (informativo, no bloquea)"
+            echo "### Trivy (${NOMBRE}) — HIGH y CRITICAL (informativo, no bloquea)"
             echo
             echo '```'
             cat trivy-resumen.txt
@@ -221,7 +223,7 @@ jobs:
           IMAGEN: ${{ matrix.imagen }}
         run: |
           cosign verify "${IMAGEN}@${digest}" \
-            --certificate-identity-regexp "^https://github.com/CoceresRoman/pulso-alumno/" \
+            --certificate-identity-regexp "^https://github.com/CoceresRoman/pulso-alumno/\.github/workflows/publicar\.yml@refs/heads/main$" \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
   # Se dispara con el tag; NO reconstruye nada. Busca el digest que ya publicó (y firmó y
@@ -258,36 +260,44 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ matrix.imagen }}
+          # flavor: latest=false — sin esto, metadata-action agrega latest=auto por default
+          # con type=semver, y este job movería :latest en cada tag (bug real, ver módulo 4).
+          # latest solo se mueve en el job publicar, con un push real a main.
+          flavor: |
+            latest=false
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
 
-      - name: Promover el digest de main con los tags del release
+      - name: Instalar cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      - name: Verificar la firma antes de promover
         env:
           IMAGEN: ${{ matrix.imagen }}
-          TAGS: ${{ steps.meta.outputs.tags }}
         run: |
           sha_corto="sha-${GITHUB_SHA:0:7}"
           if ! docker buildx imagetools inspect "${IMAGEN}:${sha_corto}" >/dev/null 2>&1; then
             echo "::error::no existe ${IMAGEN}:${sha_corto} en GHCR — este tag apunta a un commit que no pasó por un push a main"
             exit 1
           fi
+          digest=$(docker buildx imagetools inspect "${IMAGEN}:${sha_corto}" | awk '/^Digest:/{print $2; exit}')
+          cosign verify "${IMAGEN}@${digest}" \
+            --certificate-identity-regexp "^https://github.com/CoceresRoman/pulso-alumno/\.github/workflows/publicar\.yml@refs/heads/main$" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com
+          echo "digest=$digest" >> "$GITHUB_ENV"
+
+      - name: Promover el digest ya verificado con los tags del release
+        env:
+          IMAGEN: ${{ matrix.imagen }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
           args=()
           while IFS= read -r t; do
             [ -n "$t" ] && args+=("-t" "$t")
           done <<< "$TAGS"
-          docker buildx imagetools create "${args[@]}" "${IMAGEN}:${sha_corto}"
-
-      - name: Instalar cosign
-        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
-
-      - name: Verificar la firma del digest promovido
-        run: |
-          digest=$(docker buildx imagetools inspect "${{ matrix.imagen }}:sha-${GITHUB_SHA:0:7}" | awk '/^Digest:/{print $2; exit}')
-          cosign verify "${{ matrix.imagen }}@${digest}" \
-            --certificate-identity-regexp "^https://github.com/CoceresRoman/pulso-alumno/" \
-            --certificate-oidc-issuer https://token.actions.githubusercontent.com
+          docker buildx imagetools create "${args[@]}" "${IMAGEN}@${digest}"
 
   release:
     name: release
