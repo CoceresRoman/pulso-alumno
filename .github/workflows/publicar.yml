@@ -279,6 +279,9 @@ jobs:
           done <<< "$TAGS"
           docker buildx imagetools create "${args[@]}" "${IMAGEN}:${sha_corto}"
 
+      - name: Instalar cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
       - name: Verificar la firma del digest promovido
         run: |
           digest=$(docker buildx imagetools inspect "${{ matrix.imagen }}:sha-${GITHUB_SHA:0:7}" | awk '/^Digest:/{print $2; exit}')
