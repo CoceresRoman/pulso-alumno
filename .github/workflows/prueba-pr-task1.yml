@@ -1,0 +1,9 @@
+name: prueba-pr-task1
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  ok:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo hola
