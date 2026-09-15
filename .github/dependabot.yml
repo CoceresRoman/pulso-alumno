@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      acciones:
+        patterns:
+          - "*"
+    # Dependabot entiende el comentario "# vX.Y.Z" al lado de un SHA fijado:
+    # actualiza el SHA y ese comentario juntos. Sin cooldown: no está
+    # soportado para este ecosistema.
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      dependencias:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 5
+      semver-major-days: 14

@@ -1,0 +1,42 @@
+name: publicar (runners nativos)
+
+# Mismo resultado que "publicar", pero sin QEMU: cada plataforma se builda en
+# su propio runner nativo con el reusable workflow oficial de Docker
+# (docker/github-builder). Corre en cada push para poder comparar, run contra
+# run, el tiempo contra el job build-app de publicar.yml (que usa QEMU).
+on:
+  push:
+    branches-ignore:
+      - "dependabot/**"
+  workflow_dispatch: {}
+
+concurrency:
+  group: publicar-nativo-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  build-app:
+    uses: docker/github-builder/.github/workflows/build.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a # v1.17.0
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    with:
+      output: image
+      push: true
+      platforms: linux/amd64,linux/arm64
+      distribute: true
+      setup-qemu: false
+      context: .
+      file: Dockerfile
+      cache: true
+      meta-images: ghcr.io/coceresroman/pulso-alumno-app
+      meta-tags: |
+        type=sha,prefix=nativo-sha-,format=short
+    secrets:
+      registry-auths: |
+        - registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}

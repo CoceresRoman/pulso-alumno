@@ -1,0 +1,39 @@
+name: desplegar
+
+# Lo llama publicar.yml (workflow_call) apenas termina de firmar la imagen.
+# También queda disponible workflow_dispatch para redesplegar a mano un
+# digest viejo — pero ojo (sección 13): un workflow_dispatch solo aparece en
+# "Run workflow" y se puede disparar por API una vez que el archivo vive en
+# la rama default del repo.
+on:
+  workflow_call:
+    inputs:
+      digest:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      digest:
+        description: "Digest de ghcr.io/coceresroman/pulso-alumno-app a desplegar (sha256:...)"
+        required: true
+        type: string
+
+concurrency:
+  group: desplegar-produccion
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: produccion
+    permissions:
+      contents: read
+    steps:
+      - name: Desplegar (simulado)
+        env:
+          DIGEST: ${{ inputs.digest }}
+        run: |
+          echo "desplegando ghcr.io/coceresroman/pulso-alumno-app@${DIGEST} a produccion"
