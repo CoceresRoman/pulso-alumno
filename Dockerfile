@@ -15,6 +15,13 @@ FROM node:${NODE_VERSION} AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 
+# La imagen base publicada no siempre trae los últimos parches de seguridad de
+# Debian (Trivy lo detecta como CRITICAL con arreglo disponible, módulo 4): un
+# upgrade en el momento del build los aplica sin esperar a que alguien publique
+# un tag nuevo de node:24-trixie-slim.
+# hadolint ignore=DL3005
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
 

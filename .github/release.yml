@@ -1,0 +1,19 @@
+changelog:
+  exclude:
+    labels:
+      - ignorar-en-release
+  categories:
+    - title: Funcionalidades
+      labels:
+        - feature
+        - enhancement
+    - title: Arreglos
+      labels:
+        - fix
+        - bug
+    - title: Dependencias
+      labels:
+        - dependencies
+    - title: Otros cambios
+      labels:
+        - "*"

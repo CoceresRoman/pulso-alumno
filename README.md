@@ -1,5 +1,7 @@
 # Pulso
 
+[![CI](https://github.com/CoceresRoman/pulso-alumno/actions/workflows/ci.yml/badge.svg)](https://github.com/CoceresRoman/pulso-alumno/actions/workflows/ci.yml)
+
 Monitor de uptime hecho para practicar DevOps en la [ruta DevOps](https://curso.romancoceres.com/rutas/devops) del curso.
 
 ## Qué hace
